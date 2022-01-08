@@ -5,6 +5,7 @@ import textfieldValidation from '../validations/textfield-validation';
 import emailValidation from '../validations/email-validation';
 import passwordValidation from '../validations/password-validation';
 import { useForm, Controller } from 'react-hook-form';
+import * as accountServices from '../services/account-services';
 
 export default function RegisterForm({ navigation }) {
 
@@ -19,11 +20,49 @@ export default function RegisterForm({ navigation }) {
     } = useForm();
 
     //função para capturar o evento SUBMIT do formulário
-    const onSubmit = () => {
-        Alert.alert(
-            'Parabéns!',
-            'Sua conta de usuário foi criada com sucesso.'
-        );
+    const onSubmit = (data) => {
+
+        //executando o serviço da API
+        accountServices.postRegister(data)
+            .then( //capturando a resposta de sucesso (callback/promisse)
+                result => {
+
+                    //limpar os campos da tela
+                    reset({
+                        nome: '', email: '', senha: '', senhaConfirmacao: ''
+                    });
+
+                    Alert.alert(
+                        'Parabéns!', result.message
+                    );
+                }
+            )
+            .catch( //capturando a resposta de erro (callback/promisse)
+                e => {
+                    switch (e.response.status) {
+                        case 400:
+                            Alert.alert(
+                                'Erro de Preenchimento!',
+                                e.response.data.errors.SenhaConfirmacao[0]
+                            );
+                            break;
+
+                        case 422:
+                            Alert.alert(
+                                'Usuário inválido!',
+                                e.response.data
+                            );
+                            break;
+
+                        default:
+                            Alert.alert(
+                                'Falha!',
+                                'Não foi possível realizar a operação, tente novamente.'
+                            );
+                            break;
+                    }
+                }
+            )
     }
 
     return (
@@ -45,7 +84,7 @@ export default function RegisterForm({ navigation }) {
                             name="nome"
                             defaultValue=''
                             render={
-                                ({ field : { onChange, onBlur, value } }) => (
+                                ({ field: { onChange, onBlur, value } }) => (
                                     <TextInput
                                         label="Entre com o seu nome:"
                                         keyboardType='default'
@@ -61,11 +100,11 @@ export default function RegisterForm({ navigation }) {
                         />
 
                         {
-                            errors.nome && <Text style={{ 
+                            errors.nome && <Text style={{
                                 fontSize: 15,
                                 color: '#BB2124'
-                             }}>
-                                 {errors.nome.message}
+                            }}>
+                                {errors.nome.message}
                             </Text>
                         }
 
@@ -81,7 +120,7 @@ export default function RegisterForm({ navigation }) {
                             name="email"
                             defaultValue=''
                             render={
-                                ({ field : { onChange, onBlur, value } }) => (
+                                ({ field: { onChange, onBlur, value } }) => (
                                     <TextInput
                                         label="Entre com o seu email:"
                                         keyboardType='email-address'
@@ -97,11 +136,11 @@ export default function RegisterForm({ navigation }) {
                         />
 
                         {
-                            errors.email && <Text style={{ 
+                            errors.email && <Text style={{
                                 fontSize: 15,
                                 color: '#BB2124'
-                             }}>
-                                 {errors.email.message}
+                            }}>
+                                {errors.email.message}
                             </Text>
                         }
 
@@ -117,7 +156,7 @@ export default function RegisterForm({ navigation }) {
                             name="senha"
                             defaultValue=''
                             render={
-                                ({ field : { onChange, onBlur, value } }) => (
+                                ({ field: { onChange, onBlur, value } }) => (
                                     <TextInput
                                         label="Entre com a sua senha:"
                                         keyboardType='default'
@@ -133,11 +172,11 @@ export default function RegisterForm({ navigation }) {
                         />
 
                         {
-                            errors.senha && <Text style={{ 
+                            errors.senha && <Text style={{
                                 fontSize: 15,
                                 color: '#BB2124'
-                             }}>
-                                 {errors.senha.message}
+                            }}>
+                                {errors.senha.message}
                             </Text>
                         }
 
@@ -153,7 +192,7 @@ export default function RegisterForm({ navigation }) {
                             name="senhaConfirmacao"
                             defaultValue=''
                             render={
-                                ({ field : { onChange, onBlur, value } }) => (
+                                ({ field: { onChange, onBlur, value } }) => (
                                     <TextInput
                                         label="Confirme a sua senha:"
                                         keyboardType='default'
@@ -169,11 +208,11 @@ export default function RegisterForm({ navigation }) {
                         />
 
                         {
-                            errors.senhaConfirmacao && <Text style={{ 
+                            errors.senhaConfirmacao && <Text style={{
                                 fontSize: 15,
                                 color: '#BB2124'
-                             }}>
-                                 {errors.senhaConfirmacao.message}
+                            }}>
+                                {errors.senhaConfirmacao.message}
                             </Text>
                         }
 

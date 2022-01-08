@@ -4,6 +4,8 @@ import { Button, Card, TextInput } from 'react-native-paper';
 import emailValidation from '../validations/email-validation';
 import passwordValidation from '../validations/password-validation';
 import { useForm, Controller } from 'react-hook-form';
+import * as accountServices from '../services/account-services';
+import * as authHelpers from '../helpers/auth-helpers';
 
 //criando o componente como função
 export default function LoginForm({ navigation }) {
@@ -19,11 +21,42 @@ export default function LoginForm({ navigation }) {
   } = useForm();
 
   //função para capturar o evento de SUBMIT do formulário
-  const onSubmit = () => {
-    Alert.alert(
-      'Seja bem vindo.', //título da mensagem
-      'Autenticação realizada com sucesso!'
-    )
+  const onSubmit = (data) => {
+
+    accountServices.postLogin(data)
+      .then(
+        result => {
+
+          reset({ email : '', senha : '' })
+
+          Alert.alert(
+            'Seja bem vindo!', result.mensagem
+          )
+
+          //gravar os dados obtidos na memória do aplicativo!
+          authHelpers.signIn(result);
+
+          navigation.navigate('home');
+        }
+      )
+      .catch(
+        e => {
+          switch (e.response.status) {
+            case 401:
+              Alert.alert(
+                'Acesso não permitido.', e.response.data
+              )
+              break;
+
+            default:
+              Alert.alert(
+                'Falha.',
+                'Não foi possivel realizar a operação, tente novamente.'
+              )
+              break;
+          }
+        }
+      )
   }
 
   return (

@@ -2,6 +2,7 @@ import React from 'react';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import PasswordForm from './components/PasswordForm';
+import Home from './components/Home';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -17,6 +18,7 @@ export default function App() {
         <Stack.Screen name="login" component={LoginForm} />
         <Stack.Screen name="register" component={RegisterForm} />
         <Stack.Screen name="password" component={PasswordForm} />
+        <Stack.Screen name="home" component={Home} />
       </Stack.Navigator>
     </NavigationContainer>
   )
